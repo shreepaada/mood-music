@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Motion Playground</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --fg:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#7c3aed;
+      --accent2:#22d3ee;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, Arial;
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(124,58,237,.25), transparent), var(--bg);
+      color:var(--fg);
+      overflow-x:hidden;
+    }
+    .nav{
+      position:fixed; top:0; left:0; right:0;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:16px 32px;
+      backdrop-filter: blur(10px);
+      z-index:10;
+    }
+    .logo{font-weight:700; letter-spacing:1px}
+    .hero{
+      height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+      gap:16px; padding:0 20px;
+    }
+    .title{font-size:48px; font-weight:800; opacity:0}
+    .subtitle{color:var(--muted); opacity:0}
+    .cta{
+      margin-top:20px; padding:12px 24px; border-radius:999px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none; color:white; cursor:pointer; opacity:0;
+    }
+    .grid{
+      padding:80px 40px;
+      display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:20px;
+    }
+    .card{
+      height:140px; border-radius:16px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(6px);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:600; opacity:0; transform: translateY(40px);
+    }
+    .cursor{
+      width:20px; height:20px; border:2px solid white;
+      border-radius:50%; position:fixed; pointer-events:none;
+      transform: translate(-50%, -50%);
+      z-index:999;
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<div class="nav">
+  <div class="logo">MOTION</div>
+  <div>UI Playground</div>
+</div>
+
+<section class="hero">
+  <h1 class="title">Design in Motion</h1>
+  <p class="subtitle">Micro-interactions. Depth. Feel.</p>
+  <button class="cta" id="cta">Explore</button>
+</section>
+
+<section class="grid" id="grid">
+  <div class="card">Speed</div>
+  <div class="card">Delight</div>
+  <div class="card">Feedback</div>
+  <div class="card">Depth</div>
+  <div class="card">Clarity</div>
+  <div class="card">Flow</div>
+</section>
+
+<script>
+  // HERO TIMELINE
+  const tl = anime.timeline({ easing: 'easeOutExpo', duration: 800 });
+
+  tl.add({ targets: '.title', translateY: [-40,0], opacity:[0,1] })
+    .add({ targets: '.subtitle', translateY: [-20,0], opacity:[0,1] }, '-=500')
+    .add({ targets: '.cta', scale:[0.8,1], opacity:[0,1] }, '-=500');
+
+  // CTA MICRO INTERACTION
+  const btn = document.getElementById('cta');
+  btn.addEventListener('mouseenter', () => {
+    anime({ targets: btn, scale:1.1, duration:200 });
+  });
+  btn.addEventListener('mouseleave', () => {
+    anime({ targets: btn, scale:1, duration:200 });
+  });
+
+  // STAGGER GRID ON SCROLL
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        anime({
+          targets: '.card',
+          translateY: [40,0],
+          opacity: [0,1],
+          delay: anime.stagger(100),
+          easing: 'easeOutCubic'
+        });
+        observer.disconnect();
+      }
+    });
+  });
+
+  observer.observe(document.getElementById('grid'));
+
+  // CUSTOM CURSOR
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', (e) => {
+    anime({
+      targets: cursor,
+      left: e.clientX,
+      top: e.clientY,
+      duration: 200,
+      easing: 'easeOutQuad'
+    });
+  });
+
+  // PARALLAX FEEL
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 20;
+    const y = (e.clientY / window.innerHeight - 0.5) * 20;
+    anime({
+      targets: '.hero',
+      translateX: x,
+      translateY: y,
+      duration: 300
+    });
+  });
+</script>
+
+</body>
+</html>
+
